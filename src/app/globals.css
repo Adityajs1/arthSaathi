@@ -1,49 +1,67 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@import "tailwindcss";
+
+@theme {
+  --color-brand-bg: #fdfcf7;
+  --color-brand-teal: #0e8a6a;
+  --color-brand-teal-deep: #0a6a52;
+  --color-brand-teal-soft: #dff6ef;
+  --color-brand-zinc: #2f2418;
+  --color-brand-zinc-muted: #735f49;
+  
+  --radius-premium: 2.5rem;
+  --radius-card: 1.5rem;
+  
+  --font-manrope: "Manrope", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-[var(--color-brand-bg)] text-[var(--color-brand-zinc)] font-manrope;
+    background-image: 
+      radial-gradient(circle at 0% 0%, rgba(14, 138, 106, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 100% 100%, rgba(236, 171, 78, 0.08) 0%, transparent 40%);
   }
 }
 
-html {
-  height: 100%;
-}
+@layer components {
+  .premium-card {
+    @apply bg-white border border-black/5 rounded-[var(--radius-premium)] p-8 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+  
+  .icon-circle {
+    @apply w-12 h-12 rounded-full flex items-center justify-center bg-[var(--color-brand-teal-soft)] text-[var(--color-brand-teal)] text-xl mb-6;
+  }
+  
+  .nav-link {
+    @apply px-4 py-2 rounded-full font-bold text-[var(--color-brand-zinc-muted)] transition-colors hover:bg-[var(--color-brand-teal-soft)] hover:text-[var(--color-brand-teal-deep)];
+  }
+  
+  .nav-link-active {
+    @apply bg-[var(--color-brand-teal)] text-white;
+  }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
+  /* ChatBot Floating Styles */
+  .chat-toggle {
+    @apply fixed bottom-8 right-8 z-[100] bg-brand-teal text-white px-8 py-5 rounded-full flex items-center gap-4 hover:bg-brand-teal-deep hover:shadow-2xl active:scale-95;
+  }
 
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  .chat-toggle-icon {
+    @apply text-2xl;
+  }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
+  .chat-toggle-text {
+    @apply font-black text-sm uppercase tracking-widest;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  .chat-panel-floating {
+    @apply fixed bottom-8 right-8 z-[101] w-[90vw] md:w-[420px] h-[70vh] max-h-[700px] bg-white rounded-[2.5rem] flex flex-col;
+  }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
