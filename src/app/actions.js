@@ -9,12 +9,20 @@ export async function generateChatResponse({
   conversationHistory,
   adaptationInstruction,
   calculationContext,
+  lang = "en"
 }) {
   const mistralKey = process.env.MISTRAL_API_KEY;
   const mistralModel = process.env.MISTRAL_MODEL || "mistral-small-latest";
 
   if (!mistralKey) {
     return "Mistral API Key missing. Please check your environment variables.";
+  }
+
+  let languageInstruction = "Respond in English.";
+  if (lang === "hi") {
+    languageInstruction = "Respond in Hindi (using Hindi script).";
+  } else if (lang === "hinglish") {
+    languageInstruction = "Respond in Hinglish (Hindi language using Roman script/Latin characters).";
   }
 
   try {
@@ -27,7 +35,7 @@ export async function generateChatResponse({
       body: JSON.stringify({
         model: mistralModel,
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: `${systemPrompt} ${languageInstruction}` },
           { role: "user", content: `Context: ${loanContext}\nNotes: ${calculationContext}\nQuery: ${userQuery}` }
         ],
         temperature: 0.7
@@ -48,7 +56,7 @@ export async function generateChatResponse({
   }
 }
 
-export async function analyzeAgreement({ inputText }) {
+export async function analyzeAgreement({ inputText, lang = "en" }) {
   const mistralKey = process.env.MISTRAL_API_KEY;
   const mistralModel = process.env.MISTRAL_MODEL || "mistral-small-latest";
 
@@ -56,17 +64,26 @@ export async function analyzeAgreement({ inputText }) {
     return "Mistral API Key missing. Please check your environment variables.";
   }
 
+  let languageInstruction = "Respond in English.";
+  if (lang === "hi") {
+    languageInstruction = "Respond in Hindi (using Hindi script). Keep the technical terms in English if necessary but explain them in Hindi.";
+  } else if (lang === "hinglish") {
+    languageInstruction = "Respond in Hinglish (Hindi language using Roman script/Latin characters). This is for an Indian audience, so use a mix of Hindi and English as naturally spoken.";
+  }
+
   const prompt = `
 You are an expert legal and financial document analyst.
 
 Your task is to analyze the following agreement text and extract critical information in a clear, structured, and easy-to-understand way for a non-expert user.
+
+${languageInstruction}
 
 Text:
 ${inputText}
 
 Instructions:
 
-1. Provide a Simple Summary (in plain English, 3–5 sentences).
+1. Provide a Simple Summary (in the requested language, 3–5 sentences).
 
 2. Extract Important Clauses:
    - Payment terms
@@ -101,7 +118,7 @@ Instructions:
 7. Confidence Note:
    - Mention if any part of the document is unclear or missing context.
 
-Return output in this exact Markdown format:
+Return output in this exact Markdown format (Headers should be in English for consistency, but content must be in ${lang === "hi" ? "Hindi" : lang === "hinglish" ? "Hinglish" : "English"}):
 
 **Simple Summary:**
 [A concise summary in 3-5 sentences]

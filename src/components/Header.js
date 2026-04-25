@@ -17,7 +17,7 @@ export default function Header() {
           <div className="flex gap-6 items-center">
             <Link href="/loan-analyzer" className="nav-link">Analyzer</Link>
             <Link href="/simulator" className="nav-link relative">
-              Simulator
+              Visualize
               <span className="absolute -top-1 -right-2 bg-amber-400 text-[8px] font-black px-1 rounded text-white animate-pulse">NEW</span>
             </Link>
             <Link href="/calculator" className="nav-link">Calculator</Link>
@@ -27,7 +27,7 @@ export default function Header() {
           <div className="h-4 w-px bg-zinc-200 hidden md:block" />
 
           <select 
-            className="bg-white/10 border border-black/5 px-4 py-2 rounded-xl font-bold outline-none cursor-pointer text-sm shadow-sm hover:shadow-md transition-all"
+            className="standard-select !w-auto !py-2 !px-4"
             value={lang} 
             onChange={(e) => setLang(e.target.value)}
           >

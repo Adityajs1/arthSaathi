@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { analyzeAgreement, extractTextFromPdf } from "../actions";
 import ReactMarkdown from "react-markdown";
+import { useLanguage } from "@/context/LanguageContext";
 
 function SubtopicResult({ title, content }) {
   if (!content) return null;
@@ -17,6 +18,7 @@ function SubtopicResult({ title, content }) {
 }
 
 export default function Summarizer() {
+  const { lang, t } = useLanguage();
   const [inputText, setInputText] = useState("");
   const [result, setResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -52,7 +54,7 @@ export default function Summarizer() {
 
     setIsLoading(true);
     try {
-      const analysis = await analyzeAgreement({ inputText });
+      const analysis = await analyzeAgreement({ inputText, lang });
       setResult(analysis);
     } catch (err) {
       setResult("An error occurred during analysis.");
@@ -64,14 +66,20 @@ export default function Summarizer() {
   return (
     <div className="space-y-12 px-6 pb-20">
       {/* Hero Section */}
-      <section className="bg-brand-zinc text-white rounded-[2.5rem] p-10 md:p-16 text-center space-y-6 shadow-2xl relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-teal/20 to-transparent opacity-50" />
-        <div className="relative z-10 space-y-4">
-          <span className="bg-white/10 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-brand-teal-soft">AI Legal Intelligence</span>
-          <h1 className="text-4xl md:text-5xl font-black font-manrope leading-tight">📄 Loan Agreement Analyzer</h1>
-          <p className="text-zinc-400 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
-            Upload your agreement or paste the text and our AI will find hidden red flags, risky terms, and unfair charges.
+      <section className="hero-section">
+        <div className="hero-overlay" />
+        <div className="relative z-10 max-w-xl space-y-6">
+          <span className="bg-white/10 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-brand-teal-soft">{t.aiLegalIntel}</span>
+          <h1 className="text-4xl md:text-5xl font-black font-manrope leading-tight">{t.analyzeLoanBestWay}</h1>
+          <p className="text-brand-teal-soft/80 text-lg leading-relaxed font-medium">
+            {t.summarizerDesc}
           </p>
+        </div>
+        
+        <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-[2rem] text-center min-w-[280px]">
+          <span className="text-white/60 text-[10px] font-black uppercase tracking-widest mb-2 block">{t.processingEngine}</span>
+          <div className="text-3xl font-black mb-1">{t.pdfJsEngine}</div>
+          <p className="text-white/50 text-xs italic">{t.privacyFirst}</p>
         </div>
       </section>
 
@@ -82,10 +90,10 @@ export default function Summarizer() {
               <div className="flex flex-col md:flex-row gap-8">
                 {/* File Uploader */}
                 <div className="flex-grow space-y-4">
-                  <label className="text-xs font-black text-zinc-400 uppercase tracking-widest block">Upload Document (PDF)</label>
+                  <label className="input-label">{t.uploadDoc}</label>
                   <label className={`
                     w-full h-48 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center cursor-pointer transition-all
-                    ${isExtracting ? 'border-brand-teal bg-brand-teal/5' : inputText ? 'border-green-400 bg-green-50' : 'border-zinc-100 hover:border-brand-teal hover:bg-zinc-50'}
+                    ${isExtracting ? 'border-brand-teal bg-brand-teal-soft/20' : inputText ? 'border-emerald-400 bg-emerald-50' : 'border-zinc-100 hover:border-brand-teal hover:bg-zinc-50'}
                   `}>
                     <input type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" disabled={isExtracting} />
                     <div className="text-center space-y-2 px-4">
@@ -93,10 +101,10 @@ export default function Summarizer() {
                          {isExtracting ? '⚙️' : inputText ? '✅' : '📁'}
                        </span>
                        <p className="font-bold text-zinc-600">
-                         {isExtracting ? 'Analyzing PDF Content...' : inputText ? 'PDF Loaded Successfully' : 'Click to upload or drag & drop'}
+                         {isExtracting ? t.analyzingPdf : inputText ? t.pdfLoaded : t.clickToUpload}
                        </p>
                        <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
-                         {inputText ? 'Ready for Analysis' : 'PDF Files only'}
+                         {inputText ? t.readyForAnalysis : t.pdfOnly}
                        </p>
                     </div>
                   </label>
@@ -106,14 +114,29 @@ export default function Summarizer() {
                 <div className="hidden md:block w-px bg-zinc-100" />
 
                 {/* Text Input */}
-                <div className="w-full space-y-4">
-                   <label className="text-xs font-black text-zinc-400 uppercase tracking-widest block">Agreement Text</label>
-                   <textarea 
-                      className="w-full h-48 bg-zinc-50 border border-zinc-100 rounded-3xl p-6 font-medium text-sm text-zinc-700 outline-none focus:ring-4 focus:ring-brand-teal/5 transition-all"
-                      placeholder="Paste your legal text here..."
-                      value={inputText}
-                      onChange={(e) => setInputText(e.target.value)}
-                   />
+                <div className="w-full space-y-4 flex flex-col">
+                   <div className="flex justify-between items-center">
+                     <label className="input-label mb-0">{t.agreementText}</label>
+                     {inputText && (
+                       <button 
+                         onClick={() => setInputText("")}
+                         className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline transition-all"
+                       >
+                         {t.clearText}
+                       </button>
+                     )}
+                   </div>
+                   <div className="relative flex-grow">
+                     <textarea 
+                        className="w-full h-64 bg-zinc-50/50 border border-zinc-200 rounded-[2rem] p-8 font-medium text-sm text-zinc-600 outline-none focus:border-brand-teal/30 focus:ring-4 focus:ring-brand-teal/5 transition-all resize-none leading-relaxed shadow-inner no-scrollbar"
+                        placeholder={t.pastePlaceholder}
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                     />
+                     <div className="absolute bottom-6 right-8 text-[10px] font-black text-zinc-300 uppercase tracking-widest pointer-events-none select-none">
+                       {inputText ? `${inputText.length.toLocaleString()} ${t.characters}` : t.awaitingContent}
+                     </div>
+                   </div>
                 </div>
               </div>
 
@@ -121,12 +144,12 @@ export default function Summarizer() {
                  <button 
                   className={`
                     px-12 py-5 rounded-2xl font-black text-lg transition-all shadow-xl
-                    ${isLoading ? 'bg-zinc-100 text-zinc-400' : 'bg-brand-teal text-white hover:shadow-2xl hover:-translate-y-1 active:translate-y-0'}
+                    ${isLoading ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed' : 'bg-brand-teal text-white hover:shadow-brand-teal/20 hover:-translate-y-1 active:translate-y-0'}
                   `}
                   onClick={handleAnalyze} 
                   disabled={isLoading || isExtracting}
                  >
-                   {isLoading ? "Summarizing Agreement..." : "Analyze Document Now →"}
+                   {isLoading ? t.summarizing : t.analyzeNow}
                  </button>
               </div>
            </div>
@@ -139,8 +162,8 @@ export default function Summarizer() {
               <div className="flex items-center gap-4 border-b border-zinc-100 pb-8">
                  <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl font-black">!</div>
                  <div>
-                    <h2 className="text-2xl font-black text-zinc-900">Analysis Result</h2>
-                    <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Generated by Document AI Integration</p>
+                    <h2 className="text-2xl font-black text-zinc-900">{t.analysisResult}</h2>
+                    <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{t.generatedByAi}</p>
                  </div>
               </div>
 
@@ -158,9 +181,9 @@ export default function Summarizer() {
                  </ReactMarkdown>
               </div>
 
-              <div className="bg-amber-50 border-l-4 border-l-amber-400 p-6 rounded-2xl">
+              <div className="bg-amber-50 border-l-4 border-l-amber-500 p-6 rounded-2xl">
                  <p className="text-amber-800 text-sm font-bold leading-relaxed italic">
-                   "Warning: Legal AI summaries are indicative. Please consult a professional before signing any contract that involves red flags."
+                   "{t.legalWarning}"
                  </p>
               </div>
             </div>

@@ -46,12 +46,13 @@ export default function ChatBot() {
       ` : "No specific loan context provided.";
 
       const response = await generateChatResponse({
-        systemPrompt: "You are ArthSaathi — a trusted, friendly Indian financial advisor who speaks in natural Hinglish. Keep responses concise and practical. Use bullet points for lists.",
+        systemPrompt: "You are ArthSaathi — a trusted, friendly Indian financial advisor. Keep responses concise and practical. Use bullet points for lists.",
         loanContext,
         userQuery: text,
         conversationHistory: messages.slice(-5),
         adaptationInstruction: text.toLowerCase().includes("simple") ? "Explain even simpler." : "",
-        calculationContext: loanSnapshot ? `Bank rules for ${loanSnapshot.bankName}: ${bankRules[loanSnapshot.bankName].specialCondition}` : ""
+        calculationContext: loanSnapshot ? `Bank rules for ${loanSnapshot.bankName}: ${bankRules[loanSnapshot.bankName].specialCondition}` : "",
+        lang
       });
 
       setMessages(prev => [...prev, { role: "assistant", content: response }]);
@@ -78,7 +79,7 @@ export default function ChatBot() {
 
       {/* Chat Window */}
       <section 
-        className={`fixed bottom-8 right-8 w-[90vw] md:w-[400px] h-[75vh] max-h-[650px] bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-black/5 flex flex-col overflow-hidden transition-all duration-500 transform origin-bottom-right ${
+        className={`fixed bottom-8 right-8 w-[90vw] md:w-[400px] h-[75vh] max-h-[650px] bg-white rounded-[var(--radius-premium)] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-black/5 flex flex-col overflow-hidden transition-all duration-500 transform origin-bottom-right ${
           isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-20 opacity-0 scale-90 pointer-events-none'
         }`}
       >
@@ -106,7 +107,7 @@ export default function ChatBot() {
         <div className="flex-grow p-6 space-y-6 overflow-y-auto bg-zinc-50/50 no-scrollbar" ref={scrollRef}>
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === "assistant" ? "justify-start" : "justify-end"}`}>
-              <div className={`max-w-[85%] p-4 rounded-3xl text-sm font-medium leading-relaxed shadow-sm ${
+              <div className={`max-w-[85%] p-4 rounded-[1.5rem] text-sm font-medium leading-relaxed shadow-sm ${
                 msg.role === "assistant" 
                 ? "bg-white border border-black/5 text-zinc-700 rounded-tl-none" 
                 : "bg-brand-teal text-white rounded-tr-none"
