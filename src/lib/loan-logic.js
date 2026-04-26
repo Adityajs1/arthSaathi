@@ -80,6 +80,13 @@ export function getPaymentSummary(snapshot, customEmi) {
   };
 }
 
+export function calculateTenure(P, r_annual, emi) {
+  const r = r_annual / 12 / 100;
+  if (emi <= P * r) return Infinity;
+  const n = Math.log(emi / (emi - P * r)) / Math.log(1 + r);
+  return n;
+}
+
 export function formatINR(n) {
   if (isNaN(n) || n == null) return '—';
   return new Intl.NumberFormat('en-IN', {

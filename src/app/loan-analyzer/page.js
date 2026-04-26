@@ -6,14 +6,16 @@ import {
   calculateOutstanding, 
   getStage, 
   getPaymentSummary, 
-  formatINR 
+  formatINR,
+  calculateTenure
 } from "@/lib/loan-logic";
 import { useLoan } from "@/context/LoanContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { fmtMonths } from "@/lib/subamount-logic";
 
 export default function LoanAnalyzer() {
   const { setLoanSnapshot } = useLoan();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [loanAmount, setLoanAmount] = useState(2500000);
   const [interestRate, setInterestRate] = useState(8.5);
   const [tenureYears, setTenureYears] = useState(20);
@@ -23,6 +25,7 @@ export default function LoanAnalyzer() {
   const [emiType, setEmiType] = useState("Reducing Balance");
   const [currentEmi, setCurrentEmi] = useState("");
   const [loanAgeMonths, setLoanAgeMonths] = useState(24);
+  const [customMonthlyPayment, setCustomMonthlyPayment] = useState("");
 
   const tenureMonths = tenureYears * 12;
   const calculatedEmi = calculateEMI(loanAmount, interestRate, tenureMonths, emiType);
@@ -38,6 +41,9 @@ export default function LoanAnalyzer() {
     monthsPaid: loanAgeMonths 
   }, emi);
 
+  const activeEmi = customMonthlyPayment !== "" ? Number(customMonthlyPayment) : emi;
+  const remainingMonths = calculateTenure(outstanding, interestRate, activeEmi);
+
   // Sync with global context for ChatBot
   useEffect(() => {
     setLoanSnapshot({
@@ -51,12 +57,13 @@ export default function LoanAnalyzer() {
       emiType,
       monthsPaid: loanAgeMonths,
       emi,
-      outstanding
+      outstanding,
+      remainingMonths
     });
 
     // Cleanup when leaving page
     return () => setLoanSnapshot(null);
-  }, [loanAmount, interestRate, tenureYears, bankName, loanType, interestType, emiType, loanAgeMonths, emi, outstanding, setLoanSnapshot]);
+  }, [loanAmount, interestRate, tenureYears, bankName, loanType, interestType, emiType, loanAgeMonths, emi, outstanding, remainingMonths, setLoanSnapshot]);
 
   return (
     <div className="space-y-12 px-6">
@@ -140,6 +147,26 @@ export default function LoanAnalyzer() {
                 />
               </div>
 
+              <div>
+                <div className="flex justify-between mb-4">
+                  <label className="input-label mb-0">{t.monthsPaid}</label>
+                  <div className="flex items-center gap-1">
+                    <input 
+                      type="number" 
+                      value={loanAgeMonths} 
+                      onChange={(e) => setLoanAgeMonths(Number(e.target.value))}
+                      className="bg-transparent text-right font-black text-brand-teal outline-none w-12"
+                    />
+                    <span className="text-brand-teal font-black">{lang === 'hi' ? 'माह' : 'mo'}</span>
+                  </div>
+                </div>
+                <input 
+                  type="range" min="0" max={tenureMonths} step="1" value={loanAgeMonths} 
+                  onChange={(e) => setLoanAgeMonths(Number(e.target.value))}
+                  className="standard-slider"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="input-label">{t.bank}</label>
@@ -200,6 +227,39 @@ export default function LoanAnalyzer() {
             <p className="text-zinc-500 text-sm leading-relaxed italic">
               "{stage.insight} Bank interest rules for {bankName} suggests tracking your prepayments every 6 months to maximize savings."
             </p>
+          </div>
+
+          <div className="premium-card space-y-6">
+            <div className="flex items-center justify-between border-b pb-4">
+              <h3 className="text-xl font-black">{t.repaymentTimeline}</h3>
+              <span className="bg-brand-teal/10 text-brand-teal px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                {t.monthsRemaining}: {remainingMonths === Infinity ? "∞" : Math.ceil(remainingMonths)}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <label className="input-label">{t.customEmi}</label>
+                <div className="input-container">
+                  <span className="text-zinc-400 font-bold">₹</span>
+                  <input 
+                    type="number" 
+                    placeholder={Math.round(emi)}
+                    value={customMonthlyPayment}
+                    onChange={(e) => setCustomMonthlyPayment(e.target.value)}
+                    className="bg-transparent font-black text-lg outline-none w-full"
+                  />
+                </div>
+                <p className="text-xs text-zinc-400 italic">{t.basedOnCustom}</p>
+              </div>
+
+              <div className="flex flex-col justify-center items-center bg-zinc-50 rounded-2xl p-6 border border-zinc-100">
+                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">{t.monthsRemaining}</span>
+                <div className="text-3xl font-black text-brand-teal">
+                  {remainingMonths === Infinity ? "∞" : fmtMonths(Math.ceil(remainingMonths), lang)}
+                </div>
+              </div>
+            </div>
           </div>
         </main>
       </div>

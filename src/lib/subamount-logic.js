@@ -96,7 +96,12 @@ export const translations = {
     paidTillNow: "Paid Till Now",
     advisorInsights: "Advisor Insights",
     bank: "Bank",
-    type: "Type"
+    type: "Type",
+    monthsPaid: "Months Paid",
+    monthsRemaining: "Months Remaining",
+    repaymentTimeline: "Repayment Timeline",
+    customEmi: "Custom EMI",
+    basedOnCustom: "Based on your custom payment"
   },
   hi: {
     subamountAnalyzer: "सबअमाउंट एनालाइज़र",
@@ -193,7 +198,12 @@ export const translations = {
     paidTillNow: "अब तक भुगतान किया गया",
     advisorInsights: "सलाहकार की अंतर्दृष्टि",
     bank: "बैंक",
-    type: "प्रकार"
+    type: "प्रकार",
+    monthsPaid: "कितने महीने भरे",
+    monthsRemaining: "कितने महीने बचे",
+    repaymentTimeline: "पुनर्भुगतान समयरेखा",
+    customEmi: "कस्टम EMI",
+    basedOnCustom: "आपके कस्टम भुगतान के आधार पर"
   },
   hinglish: {
     subamountAnalyzer: "Subamount Analyzer",
@@ -289,7 +299,12 @@ export const translations = {
     paidTillNow: "Ab tak diya",
     advisorInsights: "Advisor Insights",
     bank: "Bank",
-    type: "Type"
+    type: "Type",
+    monthsPaid: "Kitne months bhare",
+    monthsRemaining: "Kitne months bache",
+    repaymentTimeline: "Repayment Timeline",
+    customEmi: "Custom EMI",
+    basedOnCustom: "Aapke custom payment ke basis par"
   }
 };
 
